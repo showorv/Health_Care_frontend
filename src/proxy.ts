@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDefaultDashboardRoute, getRouteOwner, isAuthRoute, UserRole } from "./lib/AuthUtils";
 import { jwtUtils } from "./lib/JwtUtils";
+import { getNewTokensWithRefreshToken, getUserInfo } from "./services/auth.serives";
 import { isTokenExpiringSoon } from "./lib/tokenUtils";
-import { getNewTokensWithRefreshToken, getUserInfo } from "./services/auth.services";
+
 
 async function refreshTokenMiddleware (refreshToken : string) : Promise<boolean> {
     try {
@@ -36,7 +37,7 @@ export async function proxy (request : NextRequest) {
 
        const routerOwner = getRouteOwner(pathname);
 
-       const unifySuperAdminAndAdminRole = userRole === "SUPER_ADMIN" ? "ADMIN" : userRole;
+       const unifySuperAdminAndAdminRole = userRole === "SUPERADMIN" ? "ADMIN" : userRole;
 
        userRole = unifySuperAdminAndAdminRole;
 
@@ -80,12 +81,8 @@ export async function proxy (request : NextRequest) {
 
 
        // Rule - 1 : User is logged in (has access token) and trying to access auth route -> allow
-       if(isAuth && isValidAccessToken){
-        return NextResponse.redirect(new URL(getDefaultDashboardRoute(userRole as UserRole), request.url));
-       }
-
-       // Rule - 2 : User is trying to access reset password page
-       if(pathname === "/reset-password"){
+         // Rule - 2 : User is trying to access reset password page
+         if(pathname === "/reset-password"){
 
         const email = request.nextUrl.searchParams.get("email");
 
@@ -94,12 +91,18 @@ export async function proxy (request : NextRequest) {
             if(accessToken && email){
                 const userInfo = await getUserInfo();
 
-                if(userInfo.needPasswordChange){
+                if(userInfo.isPasswordNeedChange){
                     return NextResponse.next();
                 }else{
                     return NextResponse.redirect(new URL(getDefaultDashboardRoute(userRole as UserRole), request.url));
                 }
             }
+       if(isAuth && isValidAccessToken){
+        return NextResponse.redirect(new URL(getDefaultDashboardRoute(userRole as UserRole), request.url));
+       }
+
+     
+     
 
             // Case-2 user coming from forgot password
 
@@ -146,7 +149,7 @@ export async function proxy (request : NextRequest) {
                 }
 
                 // need password change scenario
-                if (userInfo.needPasswordChange){
+                if (userInfo.isPasswordNeedChange){
                     if(pathname !== "/reset-password"){
                         const resetPasswordUrl = new URL("/reset-password", request.url);
                         resetPasswordUrl.searchParams.set("email", userInfo.email);
@@ -156,7 +159,7 @@ export async function proxy (request : NextRequest) {
                     return NextResponse.next();
                 }
 
-                if(!userInfo.needPasswordChange && pathname === "/reset-password"){
+                if(!userInfo.isPasswordNeedChange && pathname === "/reset-password"){
                     return NextResponse.redirect(new URL(getDefaultDashboardRoute(userRole as UserRole), request.url));
                 }
             }

@@ -14,16 +14,22 @@ import { Button } from "../../ui/button";
 import { Alert, AlertDescription } from "../../ui/alert";
 import AppSubmitButton from "../../shared/form/AppSubmitButton";
 
-const LoginForm = () => {
+interface LoginFormProps {
+    redirectPath ?: string;
+}
+
+const LoginForm = ({ redirectPath }: LoginFormProps) => {
     // const queryClient = useQueryClient();
 
     const [serverError, setServerError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
 
     const { mutateAsync , isPending} = useMutation({
-        mutationFn : (payload : ILoginPayload) => loginAction(payload),
+        mutationFn : (payload : ILoginPayload) => loginAction(payload, redirectPath),
     })
 
+    console.log(redirectPath,"ReD");
+    
     const form = useForm({
         defaultValues : {
             email : "",
@@ -46,7 +52,7 @@ const LoginForm = () => {
         }
     })
   return (
-    <Card className="w-full max-w-md mx-auto  shadow-md">
+    <Card className="w-full max-w-md mx-auto shadow-md">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">Welcome Back!</CardTitle>
         <CardDescription>

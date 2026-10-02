@@ -1,4 +1,4 @@
-export type UserRole = "SUPER_ADMIN" | "ADMIN" | "DOCTOR" | "PATIENT";
+export type UserRole = "SUPERADMIN" | "ADMIN" | "DOCTOR" | "PATIENT";
 
 export const authRoutes = [ "/login", "/register", "/forgot-password", "/reset-password", "/verify-email" ];
 
@@ -43,7 +43,7 @@ export const isRouteMatches = (pathname : string, routes : RouteConfig) => {
     return routes.pattern.some((pattern : RegExp) => pattern.test(pathname));
 }
 
-export const getRouteOwner = (pathname : string) : "SUPER_ADMIN" | "ADMIN" | "DOCTOR" | "PATIENT" | "COMMON" | null => {
+export const getRouteOwner = (pathname : string) : "SUPERADMIN" | "ADMIN" | "DOCTOR" | "PATIENT" | "COMMON" | null => {
     if(isRouteMatches(pathname, doctorProtectedRoutes)) {
         return "DOCTOR";
     }
@@ -68,7 +68,7 @@ export const getRouteOwner = (pathname : string) : "SUPER_ADMIN" | "ADMIN" | "DO
 }
 
 export const getDefaultDashboardRoute = (role : UserRole) => {
-    if(role === "ADMIN" || role === "SUPER_ADMIN") {
+    if(role === "ADMIN" || role === "SUPERADMIN") {
         return "/admin/dashboard";
     }
     if(role === "DOCTOR") {
@@ -82,7 +82,7 @@ export const getDefaultDashboardRoute = (role : UserRole) => {
 }
 
 export const isValidRedirectForRole = (redirectPath : string, role : UserRole) => {
-    const unifySuperAdminAndAdminRole = role === "SUPER_ADMIN" ? "ADMIN" : role;
+    const unifySuperAdminAndAdminRole = role === "SUPERADMIN" ? "ADMIN" : role;
 
     role = unifySuperAdminAndAdminRole;
 
