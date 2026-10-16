@@ -7,6 +7,8 @@ import UserInfoCell from "../../shared/cell/UserInfoCell";
 import StatusBadgeCell from "../../shared/cell/StatusBadgeCell";
 import DateCell from "../../shared/cell/DateCell";
 
+
+
 export const doctorColumns: ColumnDef<IDoctor>[] = [
   //id or accessorKey is same as the key in the data object
   {
@@ -24,6 +26,7 @@ export const doctorColumns: ColumnDef<IDoctor>[] = [
   {
     id: "specialties",
     accessorKey: "specialties",
+    enableSorting: false,
     header: "Specialties",
     cell: ({ row }) => {
         const specialties = row.original.specialties
